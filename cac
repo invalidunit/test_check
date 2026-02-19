@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh -
 
 
 readonly _command="${0##*/}"
