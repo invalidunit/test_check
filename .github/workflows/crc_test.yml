@@ -1,0 +1,32 @@
+name: crc test
+
+on:
+  workflow_call:
+
+jobs:
+  crc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: install depends
+        run: |
+          sudo apt update >>/dev/null
+          sudo apt install gawk sed jq curl zstd xz-utils bzip2 gzip grep gcc git automake autoconf  -y
+          git clone 'https://github.com/jpmens/jo.git' '/tmp/jo'
+          echo 'cd /tmp/jo' >>/tmp/jo_install.sh
+          echo 'autoreconf -i' >>/tmp/jo_install.sh
+          echo './configure' >>/tmp/jo_install.sh
+          echo 'make check' >>/tmp/jo_install.sh
+          echo 'make install' >>/tmp/jo_install.sh
+          chmod -R 0755 '/tmp/jo_install.sh'
+          sudo '/tmp/jo_install.sh'
+
+      - name: crc test
+        if: success()
+        run: |
+          chmod 0755 ./crc
+          ./crc './Library/'
