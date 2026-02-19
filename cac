@@ -183,7 +183,7 @@ i_max="$(printf '%s\n' "${_config}" | jq ".app|length")"
 while [ "${i}" -lt "${i_max}" ]; do
 	_sleep="$(_randnum '0-2' '1')$(_randnum '0-9' '1')"
 	echo "[*] wait \"${_sleep}s\""
-	sleep "${_sleep}"
+	echo sleep "${_sleep}"
 	unset _sleep
 	_app="$(printf '%s\n' "${_config}" | jq -r ".app[${i}].url")"
 	_id="${_app##*/id}"
