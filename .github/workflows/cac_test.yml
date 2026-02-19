@@ -1,7 +1,7 @@
 name: cac test
 
 on:
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
   crc:
