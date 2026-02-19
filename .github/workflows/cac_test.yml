@@ -1,4 +1,4 @@
-name: crc test
+name: cac test
 
 on:
   workflow_call:
@@ -25,8 +25,8 @@ jobs:
           chmod -R 0755 '/tmp/jo_install.sh'
           sudo '/tmp/jo_install.sh'
 
-      - name: crc test
+      - name: cac test
         if: success()
         run: |
-          chmod 0755 ./crc
-          ./crc './Library/'
+          chmod 0755 ./cac
+          ./cac './Library/'
