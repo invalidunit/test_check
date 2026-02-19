@@ -2,7 +2,7 @@
 
 
 readonly _command="${0##*/}"
-readonly _c_version='0.3.7-test'
+readonly _c_version='0.3.7-test-2'
 export LANG=en_US.UTF-8
 _start_time="$(date "+%Y-%m-%d-%H%M%S")"
 _path="$(echo "${1}" | sed 's#/$##')"
@@ -91,9 +91,19 @@ _randnum(){
 }
 
 _get_app_info(){
-		curl --max-time 30 -L -H "user-agent: ${_user_agent}" -H 'accept: */*' -H "authorization: ${_authorization}" -H 'origin: https://apps.apple.com' "https://amp-api-edge.apps.apple.com/v1/catalog/${1}/apps/${2}?platform=iphone&additionalPlatforms=appletv%2Cipad%2Ciphone%2Cmac%2CrealityDevice%2Cwatch&extend=accessibility%2CaccessibilityDetails%2CageRating%2CbackgroundAssetsInfo%2CbackgroundAssetsInfoWithOptional%2CcustomArtwork%2CcustomDeepLink%2CcustomIconArtwork%2Cdescription%2CexpectedReleaseDateDisplayFormat%2CfileSizeByDevice%2CgameDisplayName%2CiconArtwork%2CinstallSizeByDeviceInBytes%2CminiGamesDeepLink%2CminimumOSVersion%2CremoteControllerRequirement%2CrequirementsByDeviceFamily%2CversionHistory&include%5Bapps%5D=app-events&availableIn%5Bapp-events%5D=future&sparseLimit%5Bapps%3Acustomers-also-bought-apps%5D=0&sparseLimit%5Bapps%3Adeveloper-other-apps%5D=0&sparseLimit%5Bapps%3Arelated-editorial-items%5D=0&limit%5Breviews%5D=1"
-		echo '===================='
-		if curl --max-time 30 -s -L -H "user-agent: ${_user_agent}" -H 'accept: */*' -H "authorization: ${_authorization}" -H 'origin: https://apps.apple.com' "https://amp-api-edge.apps.apple.com/v1/catalog/${1}/apps/${2}?platform=iphone&additionalPlatforms=appletv%2Cipad%2Ciphone%2Cmac%2CrealityDevice%2Cwatch&extend=accessibility%2CaccessibilityDetails%2CageRating%2CbackgroundAssetsInfo%2CbackgroundAssetsInfoWithOptional%2CcustomArtwork%2CcustomDeepLink%2CcustomIconArtwork%2Cdescription%2CexpectedReleaseDateDisplayFormat%2CfileSizeByDevice%2CgameDisplayName%2CiconArtwork%2CinstallSizeByDeviceInBytes%2CminiGamesDeepLink%2CminimumOSVersion%2CremoteControllerRequirement%2CrequirementsByDeviceFamily%2CversionHistory&include%5Bapps%5D=app-events&availableIn%5Bapp-events%5D=future&sparseLimit%5Bapps%3Acustomers-also-bought-apps%5D=0&sparseLimit%5Bapps%3Adeveloper-other-apps%5D=0&sparseLimit%5Bapps%3Arelated-editorial-items%5D=0&limit%5Breviews%5D=1" | jq 1>"${_cac_path}/${2}_${1}-new.js"; then
+	_tmp_file="/tmp/org.nan.$(_randnum '20')"
+	t='1'
+	t_max='9'
+	while [ "${t}" -le "${t_max}" ]; do
+		curl --max-time 30 -s -L -o "${_tmp_file}" -H "user-agent: ${_user_agent}" -H 'accept: */*' -H "authorization: ${_authorization}" -H 'origin: https://apps.apple.com' "https://amp-api-edge.apps.apple.com/v1/catalog/${1}/apps/${2}?platform=iphone&additionalPlatforms=appletv%2Cipad%2Ciphone%2Cmac%2CrealityDevice%2Cwatch&extend=accessibility%2CaccessibilityDetails%2CageRating%2CbackgroundAssetsInfo%2CbackgroundAssetsInfoWithOptional%2CcustomArtwork%2CcustomDeepLink%2CcustomIconArtwork%2Cdescription%2CexpectedReleaseDateDisplayFormat%2CfileSizeByDevice%2CgameDisplayName%2CiconArtwork%2CinstallSizeByDeviceInBytes%2CminiGamesDeepLink%2CminimumOSVersion%2CremoteControllerRequirement%2CrequirementsByDeviceFamily%2CversionHistory&include%5Bapps%5D=app-events&availableIn%5Bapp-events%5D=future&sparseLimit%5Bapps%3Acustomers-also-bought-apps%5D=0&sparseLimit%5Bapps%3Adeveloper-other-apps%5D=0&sparseLimit%5Bapps%3Arelated-editorial-items%5D=0&limit%5Breviews%5D=1"
+		if grep -qi 'API capacity exceeded' "${_tmp_file}"; then
+			sleep 1
+		else
+			break
+		fi
+	done
+	unset t t_max _tmp_file
+	if jq "." "/tmp/org.nan.$(_randnum '20')" >"${_cac_path}/${2}_${1}-new.js"; then
 		_bundle="$(jq -r ".data[].attributes.platformAttributes.ios.bundleId" "${_cac_path}/${2}_${1}-new.js")"
 		_version="$(jq -r ".data[].attributes.platformAttributes.ios.versionHistory[0].versionDisplay" "${_cac_path}/${2}_${1}-new.js")"
 		_version_id="$(jq -r ".data[].attributes.platformAttributes.ios.externalVersionId" "${_cac_path}/${2}_${1}-new.js")"
